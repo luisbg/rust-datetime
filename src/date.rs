@@ -13,13 +13,18 @@
  *
  */
 
+use gcalendar::GCalendar;
 
 pub struct Date {
+    /**
+    * Gregorian Calendar
+    */
+    priv gcal: GCalendar,
     /**
     * Number of milliseconds since the standard base time known as "epoch",
     * namely 1st of January, 1970, 00:00:00 GMT.
     */
-    priv since_epoch: u16,
+    priv since_epoch: uint,
 }
 
 impl Date {
@@ -27,9 +32,11 @@ impl Date {
     * Allocates a Date object and initializes it to represent the specified
     * number of milliseconds since epoch.
     */
-    pub fn from_epoch(date: u16) -> Date {
+    pub fn from_epoch(epoch_date: uint) -> Date {
+        let cal: GCalendar = GCalendar::new_from_epoch(epoch_date);
         Date {
-            since_epoch: date
+            gcal: cal,
+            since_epoch: epoch_date
         }
     }
 
@@ -37,7 +44,7 @@ impl Date {
     * Returns the number of milliseconds since the 1st of January, 1970,
     * 00:00:00 GMT represented by this Date object.
     */
-    pub fn getTime(&self) -> u16 {
+    pub fn getTime(&self) -> uint {
         self.since_epoch
     }
 }
@@ -49,9 +56,6 @@ mod test {
     #[test]
     fn from_epoch() {
         let d = Date::from_epoch(433166421023);
-        // assert_eq!(d.getDate(), 23);
-        // assert_eq!(d.getMonth(), 9);
-        // assert_eq!(d.getYear(), 1983);
         assert_eq!(d.getTime(), 433166421023);
     }
 }
