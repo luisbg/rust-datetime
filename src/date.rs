@@ -13,6 +13,7 @@
  *
  */
 
+use extra::time;
 use gcalendar::GCalendar;
 
 pub struct Date {
@@ -41,11 +42,30 @@ impl Date {
     }
 
     /**
+    * Allocates a Date object and initializes it to represent the current time.
+    * For now time is in UTC
+    */
+    pub fn now() -> Date {
+        let ts = time::get_time();
+        let sec = (ts.sec * 1000) as uint;
+        let msec = (ts.nsec / 1000000) as uint;
+
+        Date::from_epoch(sec + msec)
+    }
+
+    /**
     * Returns the number of milliseconds since the 1st of January, 1970,
     * 00:00:00 GMT represented by this Date object.
     */
-    pub fn getTime(&self) -> uint {
+    pub fn get_time(&self) -> uint {
         self.since_epoch
+    }
+
+    /**
+    * Returns the Calendar object represented by this Date object.
+    */
+    pub fn get_cal(&self) -> GCalendar {
+        self.gcal
     }
 }
 
@@ -56,6 +76,13 @@ mod test {
     #[test]
     fn from_epoch() {
         let d = Date::from_epoch(433166421023);
-        assert_eq!(d.getTime(), 433166421023);
+        assert_eq!(d.get_time(), 433166421023);
+    }
+
+    #[test]
+    fn now() {
+        let d = Date::now();
+        println(format!("date: {}", d.get_cal().get_date()));
+        assert_eq!(true, true);
     }
 }

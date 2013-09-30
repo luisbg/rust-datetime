@@ -17,6 +17,7 @@
 #[cfg(test)]
 
 extern mod std;
+extern mod extra;
 
 pub mod date;
 pub mod gcalendar;
