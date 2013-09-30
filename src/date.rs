@@ -69,6 +69,9 @@ impl Date {
         self.gcal
     }
 
+    /**
+    * Formats the represented time according to the format string.
+    */
     pub fn strftime(&self, format: &str) -> ~str {
         let mut buf = ~"";
 
@@ -84,13 +87,47 @@ impl Date {
         buf
     }
 
+    /**
+    * Formats the current time according to the format string.
+    */
     pub fn now_strftime(format: &str) -> ~str {
         let d = Date::now();
         d.strftime(format)
     }
 
+    /**
+     * Returns a time string formatted according to ISO 8601.
+     *
+     * utc:   "2012-02-22T14:53:18Z"
+     */
     pub fn iso_format(&self) -> ~str {
         self.strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    /**
+     * Return a string of the current time in the form
+     * "Thu Jan  1 00:00:00 1970".
+     */
+    pub fn ctime(&self) -> ~str {
+        self.strftime("%c")
+    }
+
+    /**
+     * Returns a time string formatted according to RFC 822.
+     *
+     * utc:   "Thu, 22 Mar 2012 14:53:18 UTC"
+     */
+    pub fn rfc822(&self) -> ~str {
+        self.strftime("%a, %d %b %Y %T UTC")
+    }
+
+    /**
+     * Returns a time string formatted according to RFC 822 with Zulu time.
+     *
+     * utc:   "Thu, 22 Mar 2012 14:53:18 -0000"
+     */
+    pub fn rfc822z(&self) -> ~str {
+        self.strftime("%a, %d %b %Y %T %z")
     }
 }
 
@@ -145,8 +182,12 @@ mod test {
         assert_eq!(d.strftime("%w"), ~"5");
         assert_eq!(d.strftime("%Y"), ~"2009");
         assert_eq!(d.strftime("%y"), ~"09");
-        assert_eq!(d.strftime("%z"), ~"");
+        assert_eq!(d.strftime("%z"), ~"-0000");
         assert_eq!(d.strftime("%%"), ~"%");
+
         assert_eq!(d.iso_format(), ~"2009-02-13 23:31:30");
+        assert_eq!(d.ctime(), ~"Fri Feb 13 23:31:30 2009");
+        assert_eq!(d.rfc822z(), ~"Fri, 13 Feb 2009 23:31:30 -0000");
+        assert_eq!(d.rfc822z(), ~"Fri, 13 Feb 2009 23:31:30 -0000");
     }
 }

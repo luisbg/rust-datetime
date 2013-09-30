@@ -294,7 +294,7 @@ impl GCalendar {
             'Y' => self.year.to_str(),
             'y' => fmt!("%02u", self.year % 100),
             'Z' => ~"UTC",
-            'z' => ~"",
+            'z' => ~"-0000",
             '%' => ~"%",
             _   => die()
         }
