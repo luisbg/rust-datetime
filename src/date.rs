@@ -13,6 +13,7 @@
  *
  */
 
+use std::io;
 use extra::time;
 use gcalendar::GCalendar;
 
@@ -68,13 +69,28 @@ impl Date {
         self.gcal
     }
 
-    pub fn to_str(&self) -> ~str {
-        self.get_cal().get_date()
+    pub fn strftime(&self, format: &str) -> ~str {
+        let mut buf = ~"";
+
+        do io::with_str_reader(format) |rdr| {
+            while !rdr.eof() {
+                match rdr.read_char() {
+                    '%' => buf.push_str(self.get_cal().get_date(rdr.read_char())),
+                    ch => buf.push_char(ch)
+                }
+            }
+        }
+
+        buf
     }
 
-    pub fn now_str() -> ~str {
+    pub fn now_strftime(format: &str) -> ~str {
         let d = Date::now();
-        d.to_str()
+        d.strftime(format)
+    }
+
+    pub fn iso_format(&self) -> ~str {
+        self.strftime("%Y-%m-%d %H:%M:%S")
     }
 }
 
@@ -90,9 +106,47 @@ mod test {
 
     #[test]
     fn now() {
-        let d = Date::now();
-        let iso8601 = Date::now_str();
-        println(iso8601);
-        assert_eq!(d.get_cal().get_date(), iso8601);
+        println("now: " + Date::now_strftime("%Y-%m-%d %H:%M:%S"));
+        assert_eq!(true, true);
+    }
+
+    #[test]
+    fn test_strftime() {
+        let d = Date::from_epoch(1234567890543);
+        assert_eq!(d.strftime(""), ~"");
+        assert_eq!(d.strftime("%A"), ~"Friday");
+        assert_eq!(d.strftime("%a"), ~"Fri");
+        assert_eq!(d.strftime("%B"), ~"February");
+        assert_eq!(d.strftime("%b"), ~"Feb");
+        assert_eq!(d.strftime("%C"), ~"20");
+        assert_eq!(d.strftime("%c"), ~"Fri Feb 13 23:31:30 2009");
+        assert_eq!(d.strftime("%D"), ~"02/13/09");
+        assert_eq!(d.strftime("%d"), ~"13");
+        assert_eq!(d.strftime("%e"), ~"13");
+        assert_eq!(d.strftime("%f"), ~"000000030");
+        assert_eq!(d.strftime("%F"), ~"2009-02-13");
+        assert_eq!(d.strftime("%H"), ~"23");
+        assert_eq!(d.strftime("%I"), ~"11");
+        assert_eq!(d.strftime("%j"), ~"044");
+        assert_eq!(d.strftime("%k"), ~"23");
+        assert_eq!(d.strftime("%l"), ~"11");
+        assert_eq!(d.strftime("%M"), ~"31");
+        assert_eq!(d.strftime("%m"), ~"02");
+        assert_eq!(d.strftime("%n"), ~"\n");
+        assert_eq!(d.strftime("%P"), ~"pm");
+        assert_eq!(d.strftime("%p"), ~"PM");
+        assert_eq!(d.strftime("%R"), ~"23:31");
+        assert_eq!(d.strftime("%r"), ~"11:31:30 PM");
+        assert_eq!(d.strftime("%S"), ~"30");
+        assert_eq!(d.strftime("%T"), ~"23:31:30");
+        assert_eq!(d.strftime("%t"), ~"\t");
+        assert_eq!(d.strftime("%u"), ~"5");
+        assert_eq!(d.strftime("%v"), ~"13-Feb-2009");
+        assert_eq!(d.strftime("%w"), ~"5");
+        assert_eq!(d.strftime("%Y"), ~"2009");
+        assert_eq!(d.strftime("%y"), ~"09");
+        assert_eq!(d.strftime("%z"), ~"");
+        assert_eq!(d.strftime("%%"), ~"%");
+        assert_eq!(d.iso_format(), ~"2009-02-13 23:31:30");
     }
 }

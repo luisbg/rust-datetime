@@ -164,11 +164,140 @@ impl GCalendar {
         self.yday
     }
 
-    pub fn get_date(&self) -> ~str {
-        // Formatting date and time using the ISO 8601
-        // 1970-01-01T00:00:00Z
-        fmt!("%04u-%02u-%02uT%02u:%02u:%02uZ", self.year, self.month, self.mday,
-                self.hour, self.min, self.sec)
+    pub fn get_date(&self, ch: char) -> ~str {
+        let die = || fmt!("strftime: can't understand this format %c ", ch);
+        match ch {
+            'A' => match self.wday {
+                0 => ~"Sunday",
+                1 => ~"Monday",
+                2 => ~"Tuesday",
+                3 => ~"Wednesday",
+                4 => ~"Thursday",
+                5 => ~"Friday",
+                6 => ~"Saturday",
+                _ => die()
+            },
+            'a' => match self.wday {
+                0 => ~"Sun",
+                1 => ~"Mon",
+                2 => ~"Tue",
+                3 => ~"Wed",
+                4 => ~"Thu",
+                5 => ~"Fri",
+                6 => ~"Sat",
+                _ => die()
+            },
+            'B' => match self.month {
+                1 => ~"January",
+                2 => ~"February",
+                3 => ~"March",
+                4 => ~"April",
+                5 => ~"May",
+                6 => ~"June",
+                7 => ~"July",
+                8 => ~"August",
+                9 => ~"September",
+                10 => ~"October",
+                11 => ~"November",
+                12 => ~"December",
+                _ => die()
+            },
+            'b' | 'h' => match self.month {
+                1 => ~"Jan",
+                2 => ~"Feb",
+                3 => ~"Mar",
+                4 => ~"Apr",
+                5 => ~"May",
+                6 => ~"Jun",
+                7 => ~"Jul",
+                8 => ~"Aug",
+                9 => ~"Sep",
+                10 => ~"Oct",
+                11 => ~"Nov",
+                12 => ~"Dec",
+                _  => die()
+            },
+            'C' => fmt!("%02u", self.year / 100),
+            'c' => {
+                fmt!("%s %s %s %s %s",
+                     self.get_date('a'),
+                     self.get_date('b'),
+                     self.get_date('e'),
+                     self.get_date('T'),
+                     self.get_date('Y'))
+            }
+            'D' | 'x' => {
+                fmt!("%s/%s/%s",
+                     self.get_date('m'),
+                     self.get_date('d'),
+                     self.get_date('y'))
+            }
+            'd' => fmt!("%02u", self.mday),
+            'e' => fmt!("%2u", self.mday),
+            'f' => fmt!("%09u", self.sec),
+            'F' => {
+                fmt!("%s-%s-%s",
+                     self.get_date('Y'),
+                     self.get_date('m'),
+                     self.get_date('d'))
+            }
+            'H' => fmt!("%02u", self.hour),
+            'I' => {
+                let mut h = self.hour;
+                if h > 12 { h -= 12 }
+                fmt!("%02u", h)
+            }
+            'j' => fmt!("%03u", self.yday + 1),
+            'k' => fmt!("%2u", self.hour),
+            'l' => {
+                let mut h = self.hour;
+                if h == 0 { h = 12 }
+                if h > 12 { h -= 12 }
+                fmt!("%2u", h)
+            }
+            'M' => fmt!("%02u", self.min),
+            'm' => fmt!("%02u", self.month),
+            'n' => ~"\n",
+            'P' => if self.hour < 12 { ~"am" } else { ~"pm" },
+            'p' => if self.hour < 12 { ~"AM" } else { ~"PM" },
+            'R' => {
+                fmt!("%s:%s",
+                     self.get_date('H'),
+                     self.get_date('M'))
+            }
+            'r' => {
+                fmt!("%s:%s:%s %s",
+                     self.get_date('I'),
+                     self.get_date('M'),
+                     self.get_date('S'),
+                     self.get_date('p'))
+            }
+            'S' => fmt!("%02u", self.sec),
+            'T' | 'X' => {
+                fmt!("%s:%s:%s",
+                     self.get_date('H'),
+                     self.get_date('M'),
+                     self.get_date('S'))
+            }
+            't' => ~"\t",
+            'u' => {
+                let i = self.wday;
+                (if i == 0 { 7 } else { i }).to_str()
+            }
+            'v' => {
+                fmt!("%s-%s-%s",
+                     self.get_date('e'),
+                     self.get_date('b'),
+                     self.get_date('Y'))
+            }
+            'w' => self.wday.to_str(),
+            'Y' => self.year.to_str(),
+            'y' => fmt!("%02u", self.year % 100),
+            'Z' => ~"UTC",
+            'z' => ~"",
+            '%' => ~"%",
+            _   => die()
+        }
     }
 }
 
@@ -185,8 +314,6 @@ mod test {
         assert_eq!(gc.get_day_of_month(), 23);
         assert_eq!(gc.get_month(), 9);
         assert_eq!(gc.get_year(), 1983);
-        assert_eq!(gc.get_day_of_week(), 5);
-        assert_eq!(gc.get_day_of_year(), 265);
     }
 
     #[test]
@@ -194,6 +321,5 @@ mod test {
         let gc = GCalendar::new_from_epoch(433166421023);
         assert_eq!(gc.get_day_of_week(), 5);
         assert_eq!(gc.get_day_of_year(), 265);
-        assert_eq!(gc.get_date(), ~"1983-09-23T12:00:21Z");
     }
 }
