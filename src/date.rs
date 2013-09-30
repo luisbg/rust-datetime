@@ -67,6 +67,15 @@ impl Date {
     pub fn get_cal(&self) -> GCalendar {
         self.gcal
     }
+
+    pub fn to_str(&self) -> ~str {
+        self.get_cal().get_date()
+    }
+
+    pub fn now_str() -> ~str {
+        let d = Date::now();
+        d.to_str()
+    }
 }
 
 #[cfg(test)]
@@ -82,7 +91,8 @@ mod test {
     #[test]
     fn now() {
         let d = Date::now();
-        println(format!("date: {}", d.get_cal().get_date()));
-        assert_eq!(true, true);
+        let iso8601 = Date::now_str();
+        println(iso8601);
+        assert_eq!(d.get_cal().get_date(), iso8601);
     }
 }
