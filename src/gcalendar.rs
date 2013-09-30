@@ -50,7 +50,7 @@ impl GCalendar {
     /**
     * Allocates a GCalendar object
     */
-    pub fn new() -> GCalendar {
+    pub fn new_at_epoch() -> GCalendar {
         GCalendar {
             sec: 0,
             min: 0,
@@ -60,6 +60,20 @@ impl GCalendar {
             year: 0,
             day_of_week: 0,
             day_of_year: 0,
+        }
+    }
+
+    pub fn new(sec: uint, min: uint, hour: uint, day_of_month: uint, month: uint,
+            year: uint, day_of_week: uint, day_of_year: uint) -> GCalendar {
+        GCalendar {
+            sec: sec,
+            min: min,
+            hour: hour,
+            day_of_month: day_of_month,
+            month: month,
+            year: year,
+            day_of_week: day_of_week,
+            day_of_year: day_of_year,
         }
     }
 
@@ -129,7 +143,16 @@ mod test {
     use super::GCalendar;
 
     #[test]
-    fn first_test() {
+    fn new() {
+        let gc = GCalendar::new(21, 0, 12, 23, 9, 1983, 5, 265);
+        assert_eq!(gc.get_sec(), 21);
+        assert_eq!(gc.get_min(), 0);
+        assert_eq!(gc.get_hour(), 12);
+        assert_eq!(gc.get_year(), 1983);
+        assert_eq!(gc.get_day_of_year(), 265);
+    }
+
+    fn new_from_epoch() {
         let gc = GCalendar::new_from_epoch(433166421023);
         assert_eq!(gc.get_sec(), 21);
         assert_eq!(gc.get_min(), 0);
