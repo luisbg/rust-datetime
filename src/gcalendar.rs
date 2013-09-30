@@ -19,10 +19,17 @@
  * http://en.wikipedia.org/wiki/Julian_calendar
  */
 
-static YEAR_BASE: int = 1900;
+static YEARBASE: int = 1900;
 static DAYSPERLYEAR: uint = 366;
 static DAYSPERNYEAR: uint = 365;
 static DAYSPERWEEK: uint = 7;
+//static DAYSBEFOREMONTH: ~[~[uint]] = [
+static DAYSBEFOREMONTH: [[uint, ..13], ..2] = [
+    /* Normal years */
+    [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365],
+    /* Leap years */
+    [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
+];
 
 pub fn is_leap_year(year: uint) -> bool {
     (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0))
@@ -95,27 +102,33 @@ impl GCalendar {
 
         let hour = dayclock / 3600000;
         dayclock = dayclock - (hour * 3600000);
-
         let min = dayclock / 60000;
         dayclock = dayclock - (min * 60000);
-
         let sec = dayclock / 1000;
+        let wday = (dayno + 4) % 7;
 
         while (dayno >= year_size(year)) {
             dayno -= year_size(year);
             year += 1;
         }
-        let year = year;
+        let yday = dayno;
+
+        let ip = DAYSBEFOREMONTH[if is_leap_year(year) {1} else {0}];
+        let mut month = 11;
+        while (dayno < ip[month]) {
+            month -= 1;
+        }
+        dayno -= ip[month];
 
         GCalendar {
             sec: sec,
             min: min,
             hour: hour,
-            mday: 0,
-            month: 0,
+            mday: dayno + 1,
+            month: month  + 1,
             year: year,
-            wday: 0,
-            yday: dayno,
+            wday: wday,
+            yday: yday,
         }
     }
 
@@ -131,8 +144,20 @@ impl GCalendar {
         self.hour
     }
 
+    pub fn get_day_of_month(&self) -> uint {
+        self.mday
+    }
+
+    pub fn get_month(&self) -> uint {
+        self.month
+    }
+
     pub fn get_year(&self) -> uint {
         self.year
+    }
+
+    pub fn get_day_of_week(&self) -> uint {
+        self.wday
     }
 
     pub fn get_day_of_year(&self) -> uint {
@@ -155,16 +180,23 @@ mod test {
         assert_eq!(gc.get_sec(), 21);
         assert_eq!(gc.get_min(), 0);
         assert_eq!(gc.get_hour(), 12);
+        assert_eq!(gc.get_day_of_month(), 23);
+        assert_eq!(gc.get_month(), 9);
         assert_eq!(gc.get_year(), 1983);
+        assert_eq!(gc.get_day_of_week(), 5);
         assert_eq!(gc.get_day_of_year(), 265);
     }
 
+    #[test]
     fn new_from_epoch() {
         let gc = GCalendar::new_from_epoch(433166421023);
         assert_eq!(gc.get_sec(), 21);
         assert_eq!(gc.get_min(), 0);
         assert_eq!(gc.get_hour(), 12);
+        assert_eq!(gc.get_day_of_month(), 23);
+        assert_eq!(gc.get_month(), 9);
         assert_eq!(gc.get_year(), 1983);
+        assert_eq!(gc.get_day_of_week(), 5);
         assert_eq!(gc.get_day_of_year(), 265);
     }
 }
