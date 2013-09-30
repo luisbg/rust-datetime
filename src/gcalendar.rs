@@ -165,8 +165,10 @@ impl GCalendar {
     }
 
     pub fn get_date(&self) -> ~str {
-        // ToDo
-        ~""
+        // Formatting date and time using the ISO 8601
+        // 1970-01-01T00:00:00Z
+        fmt!("%04u-%02u-%02uT%02u:%02u:%02uZ", self.year, self.month, self.mday,
+                self.hour, self.min, self.sec)
     }
 }
 
@@ -190,13 +192,8 @@ mod test {
     #[test]
     fn new_from_epoch() {
         let gc = GCalendar::new_from_epoch(433166421023);
-        assert_eq!(gc.get_sec(), 21);
-        assert_eq!(gc.get_min(), 0);
-        assert_eq!(gc.get_hour(), 12);
-        assert_eq!(gc.get_day_of_month(), 23);
-        assert_eq!(gc.get_month(), 9);
-        assert_eq!(gc.get_year(), 1983);
         assert_eq!(gc.get_day_of_week(), 5);
         assert_eq!(gc.get_day_of_year(), 265);
+        assert_eq!(gc.get_date(), ~"1983-09-23T12:00:21Z");
     }
 }
