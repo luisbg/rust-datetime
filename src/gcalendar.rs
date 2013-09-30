@@ -34,49 +34,56 @@ pub fn year_size(year: uint) -> uint {
 
 
 pub struct GCalendar {
-    /**
-    */
-    sec: uint,
-    min: uint,
-    hour: uint,
-    day_of_month: uint,
-    month: uint,
-    year: uint,
-    day_of_week: uint,
-    day_of_year: uint
+    /*
+     * Calendar object with date and time.
+     */
+    sec: uint,         /* Seconds       [0-59]  */
+    min: uint,         /* Minutes       [0-59]  */
+    hour: uint,        /* Hours         [0-23]  */
+    mday: uint,        /* Day           [0-30]  */
+    month: uint,       /* Month         [0-11]  */
+    year: uint,        /* Year - 1900           */
+    wday: uint,        /* Day of week   [0-6]   */
+    yday: uint         /* Days in year  [0-365] */
 }
 
 impl GCalendar {
     /**
-    * Allocates a GCalendar object
+    * Allocates a GCalendar object at epoch.
     */
     pub fn new_at_epoch() -> GCalendar {
         GCalendar {
             sec: 0,
             min: 0,
             hour: 0,
-            day_of_month: 0,
+            mday: 0,
             month: 0,
             year: 0,
-            day_of_week: 0,
-            day_of_year: 0,
+            wday: 0,
+            yday: 0,
         }
     }
 
-    pub fn new(sec: uint, min: uint, hour: uint, day_of_month: uint, month: uint,
-            year: uint, day_of_week: uint, day_of_year: uint) -> GCalendar {
+    /**
+    * Allocates a GCalendar object at the given date and time.
+    */
+    pub fn new(sec: uint, min: uint, hour: uint, mday: uint, month: uint,
+            year: uint, wday: uint, yday: uint) -> GCalendar {
         GCalendar {
             sec: sec,
             min: min,
             hour: hour,
-            day_of_month: day_of_month,
+            mday: mday,
             month: month,
             year: year,
-            day_of_week: day_of_week,
-            day_of_year: day_of_year,
+            wday: wday,
+            yday: yday,
         }
     }
 
+    /**
+    * Allocates a GCalendar object from the milliseconds elapsed since epoch.
+    */
     pub fn new_from_epoch(since_epoch: uint) -> GCalendar {
         let epoch_year = 1970;
         let mut year = epoch_year;
@@ -104,11 +111,11 @@ impl GCalendar {
             sec: sec,
             min: min,
             hour: hour,
-            day_of_month: 0,
+            mday: 0,
             month: 0,
             year: year,
-            day_of_week: 0,
-            day_of_year: dayno,
+            wday: 0,
+            yday: dayno,
         }
     }
 
@@ -129,7 +136,7 @@ impl GCalendar {
     }
 
     pub fn get_day_of_year(&self) -> uint {
-        self.day_of_year
+        self.yday
     }
 
     pub fn get_date(&self) -> ~str {
