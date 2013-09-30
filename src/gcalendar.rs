@@ -25,7 +25,7 @@ static DAYSPERNYEAR: uint = 365;
 static DAYSPERWEEK: uint = 7;
 
 pub fn is_leap_year(year: uint) -> bool {
-    !(year % 4 != 0) && ((year % 100 != 0) || !(year % 400 != 0))
+    (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0))
 }
 
 pub fn year_size(year: uint) -> uint {
