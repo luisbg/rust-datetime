@@ -177,6 +177,7 @@ mod test {
         assert_eq!(d.strftime("%S"), ~"30");
         assert_eq!(d.strftime("%T"), ~"23:31:30");
         assert_eq!(d.strftime("%t"), ~"\t");
+        assert_eq!(d.strftime("%U"), ~"06");
         assert_eq!(d.strftime("%u"), ~"5");
         assert_eq!(d.strftime("%v"), ~"13-Feb-2009");
         assert_eq!(d.strftime("%w"), ~"5");

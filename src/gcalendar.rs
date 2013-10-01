@@ -280,6 +280,7 @@ impl GCalendar {
                      self.get_date('S'))
             }
             't' => ~"\t",
+            'U' => fmt!("%02u", (self.yday - self.wday + 7) / 7),
             'u' => {
                 let i = self.wday;
                 (if i == 0 { 7 } else { i }).to_str()
