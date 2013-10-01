@@ -164,6 +164,52 @@ impl GCalendar {
         self.yday
     }
 
+    pub fn iso_week_days (&self, yday: uint, wday: uint) -> int {
+        /* The number of days from the first day of the first ISO week of this
+        * year to the year day YDAY with week day WDAY.
+        * ISO weeks start on Monday. The first ISO week has the year's first
+        * Thursday.
+        * YDAY may be as small as yday_minimum.
+        */
+        let yday: int = yday as int;
+        let wday: int = wday as int;
+        let iso_week_start_wday: int = 1; /* Monday */
+        let iso_week1_wday: int = 4;      /* Thursday */
+        let yday_minimum: int = 366;
+        /* Add enough to the first operand of % to make it nonnegative. */
+        let big_enough_multiple_of_7: int = (yday_minimum / 7 + 2) * 7;
+
+        yday - (yday - wday + iso_week1_wday + big_enough_multiple_of_7) % 7
+            + iso_week1_wday - iso_week_start_wday
+     }
+
+    pub fn iso_week (&self, ch: char) -> ~str {
+        let mut year = self.year;
+        let mut days: int = self.iso_week_days (self.yday, self.wday);
+
+        if (days < 0) {
+            /* This ISO week belongs to the previous year. */
+            year -= 1;
+            days = self.iso_week_days (self.yday + (year_size(year)),
+                                       self.wday);
+        } else {
+            let d: int = self.iso_week_days (self.yday - (year_size(year)),
+                                             self.wday);
+            if (0 <= d) {
+                /* This ISO week belongs to the next year. */
+                year += 1;
+                days = d;
+            }
+        }
+
+        match ch {
+            'G' => fmt!("%u", year),
+            'g' => fmt!("%02u", (year % 100 + 100) % 100),
+            'V' => fmt!("%02d", days / 7 + 1),
+            _ => ~""
+        }
+    }
+
     pub fn get_date(&self, ch: char) -> ~str {
         let die = || fmt!("strftime: can't understand this format %c ", ch);
         match ch {
@@ -241,6 +287,8 @@ impl GCalendar {
                      self.get_date('m'),
                      self.get_date('d'))
             }
+            'G' => self.iso_week ('G'),
+            'g' => self.iso_week ('g'),
             'H' => fmt!("%02u", self.hour),
             'I' => {
                 let mut h = self.hour;
@@ -285,6 +333,7 @@ impl GCalendar {
                 let i = self.wday;
                 (if i == 0 { 7 } else { i }).to_str()
             }
+            'V' => self.iso_week ('V'),
             'v' => {
                 fmt!("%s-%s-%s",
                      self.get_date('e'),

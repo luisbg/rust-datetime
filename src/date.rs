@@ -162,6 +162,8 @@ mod test {
         assert_eq!(d.strftime("%e"), ~"13");
         assert_eq!(d.strftime("%f"), ~"000000030");
         assert_eq!(d.strftime("%F"), ~"2009-02-13");
+        assert_eq!(d.strftime("%G"), ~"2009");
+        assert_eq!(d.strftime("%g"), ~"09");
         assert_eq!(d.strftime("%H"), ~"23");
         assert_eq!(d.strftime("%I"), ~"11");
         assert_eq!(d.strftime("%j"), ~"044");
@@ -179,6 +181,7 @@ mod test {
         assert_eq!(d.strftime("%t"), ~"\t");
         assert_eq!(d.strftime("%U"), ~"06");
         assert_eq!(d.strftime("%u"), ~"5");
+        assert_eq!(d.strftime("%V"), ~"07");
         assert_eq!(d.strftime("%v"), ~"13-Feb-2009");
         assert_eq!(d.strftime("%w"), ~"5");
         assert_eq!(d.strftime("%Y"), ~"2009");
