@@ -184,7 +184,7 @@ impl GCalendar {
      }
 
     pub fn iso_week (&self, ch: char) -> ~str {
-        let mut year = self.year;
+        let mut year: uint = self.year;
         let mut days: int = self.iso_week_days (self.yday, self.wday);
 
         if (days < 0) {
@@ -203,15 +203,15 @@ impl GCalendar {
         }
 
         match ch {
-            'G' => fmt!("%u", year),
-            'g' => fmt!("%02u", (year % 100 + 100) % 100),
-            'V' => fmt!("%02d", days / 7 + 1),
+            'G' => format!("{}", year),
+            'g' => format!("{:02u}", (year % 100 + 100) % 100),
+            'V' => format!("{:02d}", days / 7 + 1),
             _ => ~""
         }
     }
 
     pub fn get_date(&self, ch: char) -> ~str {
-        let die = || fmt!("strftime: can't understand this format %c ", ch);
+        let die = || format!("strftime: can't understand this format {} ", ch);
         match ch {
             'A' => match self.wday {
                 0 => ~"Sunday",
@@ -263,9 +263,9 @@ impl GCalendar {
                 12 => ~"Dec",
                 _  => die()
             },
-            'C' => fmt!("%02u", self.year / 100),
+            'C' => format!("{:02u}", self.year / 100),
             'c' => {
-                fmt!("%s %s %s %s %s",
+                format!("{} {} {} {} {}",
                      self.get_date('a'),
                      self.get_date('b'),
                      self.get_date('e'),
@@ -273,76 +273,76 @@ impl GCalendar {
                      self.get_date('Y'))
             }
             'D' | 'x' => {
-                fmt!("%s/%s/%s",
+                format!("{}/{}/{}",
                      self.get_date('m'),
                      self.get_date('d'),
                      self.get_date('y'))
             }
-            'd' => fmt!("%02u", self.mday),
-            'e' => fmt!("%2u", self.mday),
-            'f' => fmt!("%09u", self.sec),
+            'd' => format!("{:02u}", self.mday),
+            'e' => format!("{:2u}", self.mday),
+            'f' => format!("{:09u}", self.sec),
             'F' => {
-                fmt!("%s-%s-%s",
+                format!("{}-{}-{}",
                      self.get_date('Y'),
                      self.get_date('m'),
                      self.get_date('d'))
             }
             'G' => self.iso_week ('G'),
             'g' => self.iso_week ('g'),
-            'H' => fmt!("%02u", self.hour),
+            'H' => format!("{:02u}", self.hour),
             'I' => {
                 let mut h = self.hour;
                 if h > 12 { h -= 12 }
-                fmt!("%02u", h)
+                format!("{:02u}", h)
             }
-            'j' => fmt!("%03u", self.yday + 1),
-            'k' => fmt!("%2u", self.hour),
+            'j' => format!("{:03u}", self.yday + 1),
+            'k' => format!("{:2u}", self.hour),
             'l' => {
                 let mut h = self.hour;
                 if h == 0 { h = 12 }
                 if h > 12 { h -= 12 }
-                fmt!("%2u", h)
+                format!("{:2u}", h)
             }
-            'M' => fmt!("%02u", self.min),
-            'm' => fmt!("%02u", self.month),
+            'M' => format!("{:02u}", self.min),
+            'm' => format!("{:02u}", self.month),
             'n' => ~"\n",
             'P' => if self.hour < 12 { ~"am" } else { ~"pm" },
             'p' => if self.hour < 12 { ~"AM" } else { ~"PM" },
             'R' => {
-                fmt!("%s:%s",
+                format!("{}:{}",
                      self.get_date('H'),
                      self.get_date('M'))
             }
             'r' => {
-                fmt!("%s:%s:%s %s",
+                format!("{}:{}:{} {}",
                      self.get_date('I'),
                      self.get_date('M'),
                      self.get_date('S'),
                      self.get_date('p'))
             }
-            'S' => fmt!("%02u", self.sec),
+            'S' => format!("{:02u}", self.sec),
             'T' | 'X' => {
-                fmt!("%s:%s:%s",
+                format!("{}:{}:{}",
                      self.get_date('H'),
                      self.get_date('M'),
                      self.get_date('S'))
             }
             't' => ~"\t",
-            'U' => fmt!("%02u", (self.yday - self.wday + 7) / 7),
+            'U' => format!("{:02u}", (self.yday - self.wday + 7) / 7),
             'u' => {
                 let i = self.wday;
                 (if i == 0 { 7 } else { i }).to_str()
             }
             'V' => self.iso_week ('V'),
             'v' => {
-                fmt!("%s-%s-%s",
+                format!("{}-{}-{}",
                      self.get_date('e'),
                      self.get_date('b'),
                      self.get_date('Y'))
             }
             'w' => self.wday.to_str(),
             'Y' => self.year.to_str(),
-            'y' => fmt!("%02u", self.year % 100),
+            'y' => format!("{:02u}", self.year % 100),
             'Z' => ~"UTC",
             'z' => ~"-0000",
             '%' => ~"%",
