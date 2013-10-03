@@ -23,7 +23,6 @@ static YEARBASE: int = 1900;
 static DAYSPERLYEAR: uint = 366;
 static DAYSPERNYEAR: uint = 365;
 static DAYSPERWEEK: uint = 7;
-//static DAYSBEFOREMONTH: ~[~[uint]] = [
 static DAYSBEFOREMONTH: [[uint, ..13], ..2] = [
     /* Normal years */
     [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365],
@@ -164,25 +163,33 @@ impl GCalendar {
         self.yday
     }
 
-    pub fn mktime(&self) -> uint {
-        /* Convert a broken down time structure to a simple representation:
-        * seconds since Epoch.
+    pub fn ydhms_diff(&self, year1: uint, yday1: uint, hour1: uint, min1: uint,
+                      sec1: uint, year0: uint, yday0: uint, hour0: uint,
+                      min0: uint, sec0: uint) -> uint {
+        /* Return an integer value measuring (YEAR1-YDAY1 HOUR1:MIN1:SEC1) -
+        * (YEAR0-YDAY0 HOUR0:MIN0:SEC0) in seconds.
         */
         // FIXME: Optimize way to calculate intervening leap days
         let mut intervening_leap_days: uint = 0;
-        let mut y: uint = self.year;
-        while (y > 1970) {
+        let mut y: uint = year1;
+        while (y > year0) {
             if is_leap_year(y) {intervening_leap_days += 1;}
             y -= 1;
         }
 
-	let years = (self.year - 1970);
-	let days = 365 * years + self.yday + intervening_leap_days;
-	let hours = 24 * days + self.hour;
-	let minutes = 60 * hours + self.min;
-	let seconds = 60 * minutes + self.sec;
+        let years = (year1 - year0);
+        let days = 365 * years + yday1 - yday0 + intervening_leap_days;
+        let hours = 24 * days + hour1 - hour0;
+        let minutes = 60 * hours + min1 - min0;
+        60 * minutes + sec1 - sec0
+    }
 
-        seconds
+    pub fn mktime(&self) -> uint {
+        /* Convert a broken down time structure to a simple representation:
+        * seconds since Epoch.
+        */
+        self.ydhms_diff(self.year, self.yday, self.hour, self.min, self.sec,
+                        1970, 0, 0, 0, 0)
     }
 
     pub fn iso_week_days (&self, yday: uint, wday: uint) -> int {
@@ -232,7 +239,6 @@ impl GCalendar {
     }
 
     pub fn get_date(&self, ch: char) -> ~str {
-        println(format!("here with {}", ch));
         let die = || format!("strftime: can't understand this format {} ", ch);
         match ch {
             'A' => match self.wday {
