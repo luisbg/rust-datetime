@@ -164,6 +164,27 @@ impl GCalendar {
         self.yday
     }
 
+    pub fn mktime(&self) -> uint {
+        /* Convert a broken down time structure to a simple representation:
+        * seconds since Epoch.
+        */
+        // FIXME: Optimize way to calculate intervening leap days
+        let mut intervening_leap_days: uint = 0;
+        let mut y: uint = self.year;
+        while (y > 1970) {
+            if is_leap_year(y) {intervening_leap_days += 1;}
+            y -= 1;
+        }
+
+	let years = (self.year - 1970);
+	let days = 365 * years + self.yday + intervening_leap_days;
+	let hours = 24 * days + self.hour;
+	let minutes = 60 * hours + self.min;
+	let seconds = 60 * minutes + self.sec;
+
+        seconds
+    }
+
     pub fn iso_week_days (&self, yday: uint, wday: uint) -> int {
         /* The number of days from the first day of the first ISO week of this
         * year to the year day YDAY with week day WDAY.
@@ -211,6 +232,7 @@ impl GCalendar {
     }
 
     pub fn get_date(&self, ch: char) -> ~str {
+        println(format!("here with {}", ch));
         let die = || format!("strftime: can't understand this format {} ", ch);
         match ch {
             'A' => match self.wday {
@@ -321,6 +343,7 @@ impl GCalendar {
                      self.get_date('p'))
             }
             'S' => format!("{:02u}", self.sec),
+            's' => format!("{}", self.mktime()),
             'T' | 'X' => {
                 format!("{}:{}:{}",
                      self.get_date('H'),
