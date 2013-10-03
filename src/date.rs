@@ -183,6 +183,7 @@ mod test {
         assert_eq!(d.strftime("%u"), ~"5");
         assert_eq!(d.strftime("%V"), ~"07");
         assert_eq!(d.strftime("%v"), ~"13-Feb-2009");
+        assert_eq!(d.strftime("%W"), ~"06");
         assert_eq!(d.strftime("%w"), ~"5");
         assert_eq!(d.strftime("%Y"), ~"2009");
         assert_eq!(d.strftime("%y"), ~"09");

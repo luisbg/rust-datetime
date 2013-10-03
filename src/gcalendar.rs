@@ -340,6 +340,7 @@ impl GCalendar {
                      self.get_date('b'),
                      self.get_date('Y'))
             }
+            'W' => format!("{:02u}", (self.yday - (self.wday - 1 + 7) % 7 + 7) / 7),
             'w' => self.wday.to_str(),
             'Y' => self.year.to_str(),
             'y' => format!("{:02u}", self.year % 100),
